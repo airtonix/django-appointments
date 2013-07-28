@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
+# from django.core.urlresolvers import reverse
 from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -41,7 +41,6 @@ class Event(models.Model):
     class Meta:
         verbose_name = _('event')
         verbose_name_plural = _('events')
-        app_label = 'schedule'
 
     def __unicode__(self):
         date_format = u'l, %s' % ugettext("DATE_FORMAT")
@@ -51,7 +50,8 @@ class Event(models.Model):
             'end': date(self.end, date_format),
         }
 
-    # def get_absolute_url(self):
+    def get_absolute_url(self):
+        return ""
     #     return reverse('event', args=[self.id])
 
     def create_relation(self, obj, distinction=None):
@@ -336,7 +336,6 @@ class EventRelation(models.Model):
     class Meta:
         verbose_name = _("event relation")
         verbose_name_plural = _("event relations")
-        app_label = 'schedule'
 
     def __unicode__(self):
         return u'%s(%s)-%s' % (self.event.title, self.distinction, self.content_object)
@@ -355,7 +354,6 @@ class Occurrence(models.Model):
     class Meta:
         verbose_name = _("occurrence")
         verbose_name_plural = _("occurrences")
-        app_label = 'schedule'
 
     def __init__(self, *args, **kwargs):
         super(Occurrence, self).__init__(*args, **kwargs)
@@ -381,7 +379,8 @@ class Occurrence(models.Model):
         self.cancelled = False
         self.save()
 
-    # def get_absolute_url(self):
+    def get_absolute_url(self):
+        return ""
     #     if self.pk is not None:
     #         return reverse('occurrence', kwargs={'occurrence_id': self.pk,
     #                                              'event_id': self.event.id})
@@ -396,32 +395,34 @@ class Occurrence(models.Model):
     #     })
 
     def get_cancel_url(self):
-        if self.pk is not None:
-            return reverse('cancel_occurrence', kwargs={'occurrence_id': self.pk,
-                                                        'event_id': self.event.id})
-        return reverse('cancel_occurrence_by_date', kwargs={
-            'event_id': self.event.id,
-            'year': self.start.year,
-            'month': self.start.month,
-            'day': self.start.day,
-            'hour': self.start.hour,
-            'minute': self.start.minute,
-            'second': self.start.second,
-        })
+        return ""
+        # if self.pk is not None:
+        #     return reverse('cancel_occurrence', kwargs={'occurrence_id': self.pk,
+        #                                                 'event_id': self.event.id})
+        # return reverse('cancel_occurrence_by_date', kwargs={
+        #     'event_id': self.event.id,
+        #     'year': self.start.year,
+        #     'month': self.start.month,
+        #     'day': self.start.day,
+        #     'hour': self.start.hour,
+        #     'minute': self.start.minute,
+        #     'second': self.start.second,
+        # })
 
     def get_edit_url(self):
-        if self.pk is not None:
-            return reverse('edit_occurrence', kwargs={'occurrence_id': self.pk,
-                                                      'event_id': self.event.id})
-        return reverse('edit_occurrence_by_date', kwargs={
-            'event_id': self.event.id,
-            'year': self.start.year,
-            'month': self.start.month,
-            'day': self.start.day,
-            'hour': self.start.hour,
-            'minute': self.start.minute,
-            'second': self.start.second,
-        })
+        return ""
+        # if self.pk is not None:
+        #     return reverse('edit_occurrence', kwargs={'occurrence_id': self.pk,
+        #                                               'event_id': self.event.id})
+        # return reverse('edit_occurrence_by_date', kwargs={
+        #     'event_id': self.event.id,
+        #     'year': self.start.year,
+        #     'month': self.start.month,
+        #     'day': self.start.day,
+        #     'hour': self.start.hour,
+        #     'minute': self.start.minute,
+        #     'second': self.start.second,
+        # })
 
     def __unicode__(self):
         return ugettext("%(start)s to %(end)s") % {
