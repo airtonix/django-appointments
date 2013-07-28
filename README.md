@@ -1,67 +1,70 @@
-h1. Django-schedule
+Django-schedule
+===============
 
 A calendaring/scheduling application, featuring:
 
- * one-time and recurring events
- * calendar exceptions (occurrences changed or cancelled)
- * occurrences accessible through Event API and Period API
- * relations of events to generic objects
- * ready to use, nice user interface
- * view day, week, month, three months and year
- * project sample which can be launched immediately and reused in your project
+ * one-time and recurring events\
+ * calendar exceptions (occurrences changed or cancelled)\
+ * occurrences accessible through Event API and Period API\
+ * relations of events to generic objects\
+ * ready to use, nice user interface\
+ * view day, week, month, three months and year\
+ * project sample which can be launched immediately and reused in your
+project
 
-See see "wiki page":http://wiki.github.com/thauber/django-schedule for more.
+See see [wiki page](http://wiki.github.com/thauber/django-schedule) for
+more.
 
-h2. Installation
+Installation
+------------
 
-Download the code; put in into your project's directory or run <pre>python setup.py install</pre> to install system-wide.
+Download the code; put in into your project’s directory or run
 
-REQUIREMENTS: python-vobject (comes with most distribution as a package).
+    python setup.py install</pre> to install system-wide.
 
-h2. Settings.py
+    REQUIREMENTS: python-vobject (comes with most distribution as a package).
 
-h3. REQUIRED
+    h2. Settings.py
 
-INSTALLED_APPS - add: 
-    'schedule'
+    h3. REQUIRED
 
-TEMPLATE_CONTEXT_PROCESSORS - add:
-    "django.core.context_processors.request"
+    INSTALLED_APPS - add:
+        'schedule'
 
-h4. Optional
+    TEMPLATE_CONTEXT_PROCESSORS - add:
+        "django.core.context_processors.request"
 
-FIRST_DAY_OF_WEEK
+    h4. Optional
 
-This setting determines which day of the week your calendar begins on if your locale doesn't already set it. Default is 0, which is Sunday.
+    FIRST_DAY_OF_WEEK
 
-OCCURRENCE_CANCEL_REDIRECT
+    This setting determines which day of the week your calendar begins on if your locale doesn't already set it. Default is 0, which is Sunday.
 
-This setting controls the behavior of :func:`Views.get_next_url`. If set, all calendar modifications will redirect here (unless there is a `next` set in the request.)
+    OCCURRENCE_CANCEL_REDIRECT
 
-SHOW_CANCELLED_OCCURRENCES
+    This setting controls the behavior of :func:`Views.get_next_url`. If set, all calendar modifications will redirect here (unless there is a `next` set in the request.)
 
-This setting controls the behavior of :func:`Period.classify_occurence`. If True, then occurences that have been cancelled will be displayed with a css class of canceled, otherwise they won't appear at all.
+    SHOW_CANCELLED_OCCURRENCES
 
-Defaults to False
+    This setting controls the behavior of :func:`Period.classify_occurence`. If True, then occurences that have been cancelled will be displayed with a css class of canceled, otherwise they won't appear at all.
 
-CHECK_PERMISSION_FUNC
+    Defaults to False
 
-This setting controls the callable used to determine if a user has permission to edit an event or occurance. The callable must take the object and the user and return a boolean. 
+    CHECK_PERMISSION_FUNC
 
-Default:
-<pre>
-    check_edit_permission(ob, user):
-        return user.is_authenticated()
-</pre>
+    This setting controls the callable used to determine if a user has permission to edit an event or occurance. The callable must take the object and the user and return a boolean. 
 
-If ob is None, then the function is checking for permission to add new events
+    Default:
 
-GET_EVENTS_FUNC
+        check_edit_permission(ob, user):
+            return user.is_authenticated()
 
-This setting controls the callable that gets all events for calendar display. The callable must take the request and the calendar and return a `QuerySet` of events. Modifying this setting allows you to pull events from multiple calendars or to filter events based on permissions
+If ob is None, then the function is checking for permission to add new
+events
 
-Default:
-<pre>
-    get_events(request, calendar):
-        return calendar.event_set.all()
-</pre>
+GET\_EVENTS\_FUNC
+
+This setting controls the callable that gets all events for calendar
+display. The callable must take the request and the calendar and return
+a `QuerySet` of events. Modifying this setting allows you to pull
+events from multiple calendars or to filter events based on permissions
