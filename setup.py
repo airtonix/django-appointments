@@ -1,23 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
- 
+
 setup(
-    name='django-schedule',
-    version='0.5b',
+    name='django-appointments',
+    version='0.0.1',
     description='A calendaring app for Django.',
-    author='Anthony Robert Hauber',
-    author_email='thauber@gmail.com',
-    url='http://github.com/thauber/django-schedule/tree/master',
-    packages=[
-        'schedule',
-        'schedule.feeds',
-        'schedule.management',
-        'schedule.management.commands',
-        'schedule.models',
-        'schedule.templatetags',
-        'schedule.tests',
-    ],
+    author='Zenobius Jiricek',
+    author_email='airtonix@gmail.com',
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     classifiers=['Development Status :: 4 - Beta',
@@ -30,5 +21,5 @@ setup(
                  'Topic :: Utilities'],
     install_requires=['setuptools', 'vobject', 'python-dateutil'],
     license='BSD',
-    test_suite = "schedule.tests",
+    test_suite="schedule.tests",
 )

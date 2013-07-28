@@ -1,4 +1,3 @@
 recursive-include docs *
-recursive-include schedule/templates *
-recursive-include schedule/models/fixtures *.json
+recursive-include appointments/models/fixtures *.json
 recursive-include project_sample *
