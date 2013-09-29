@@ -19,7 +19,17 @@ setup(
                  'Operating System :: OS Independent',
                  'Programming Language :: Python',
                  'Topic :: Utilities'],
-    install_requires=['setuptools', 'vobject', 'python-dateutil'],
+    install_requires=[
+        'setuptools',
+        'vobject',
+        'python-dateutil',
+        'django-classy-tags',
+        'django',
+    ],
     license='BSD',
-    test_suite="schedule.tests",
+    test_suite="unit_tests",
+    tests_require=[
+        'django-easytests',
+        'model_mommy',
+    ]
 )

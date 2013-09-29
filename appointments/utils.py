@@ -1,19 +1,24 @@
 import datetime
 import heapq
 
-from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponseRedirect
-from django.conf import settings
+try:
+    from urllib.parse import urlparse, urlunparse
+except ImportError:  # python 2
+    from urlparse import urlparse, urlunparse
+from django.http import HttpResponseRedirect, QueryDict
+from django.core import urlresolvers
 
-from .conf.settings import CHECK_PERMISSION_FUNC
+from .conf import settings
 
 
 class EventListManager(object):
+
     """
     This class is responsible for doing functions on a list of events. It is
     used to when one has a list of events and wants to access the occurrences
     from these events in as a group
     """
+
     def __init__(self, events):
         self.events = events
 
@@ -28,8 +33,9 @@ class EventListManager(object):
         if after is None:
             after = datetime.datetime.now()
         occ_replacer = OccurrenceReplacer(
-            Occurrence.objects.filter(event__in = self.events))
-        generators = [event._occurrences_after_generator(after) for event in self.events]
+            Occurrence.objects.filter(event__in=self.events))
+        generators = [event._occurrences_after_generator(after)
+                      for event in self.events]
         occurrences = []
 
         for generator in generators:
@@ -39,27 +45,31 @@ class EventListManager(object):
                 pass
 
         while True:
-            if len(occurrences) == 0: raise StopIteration
+            if len(occurrences) == 0:
+                raise StopIteration
 
-            generator=occurrences[0][1]
+            generator = occurrences[0][1]
 
             try:
-                next = heapq.heapreplace(occurrences, (generator.next(), generator))[0]
+                next = heapq.heapreplace(
+                    occurrences, (generator.next(), generator))[0]
             except StopIteration:
                 next = heapq.heappop(occurrences)[0]
             yield occ_replacer.get_occurrence(next)
 
 
 class OccurrenceReplacer(object):
+
     """
     When getting a list of occurrences, the last thing that needs to be done
     before passing it forward is to make sure all of the occurrences that
     have been stored in the datebase replace, in the list you are returning,
     the generated ones that are equivalent.  This class makes this easier.
     """
+
     def __init__(self, persisted_occurrences):
         lookup = [((occ.event, occ.original_start, occ.original_end), occ) for
-            occ in persisted_occurrences]
+                  occ in persisted_occurrences]
         self.lookup = dict(lookup)
 
     def get_occurrence(self, occ):
@@ -78,26 +88,9 @@ class OccurrenceReplacer(object):
         """
         Return persisted occurrences which are now in the period
         """
-        return [occ for key,occ in self.lookup.items() if (occ.start < end and occ.end >= start and not occ.cancelled)]
+        return [occ for key, occ in self.lookup.items() if (occ.start < end and occ.end >= start and not occ.cancelled)]
 
 
-class check_event_permissions(object):
-
-    def __init__(self, f):
-        self.f = f
-        self.contenttype = ContentType.objects.get(app_label='schedule', model='event')
-
-    def __call__(self, request, *args, **kwargs):
-        user = request.user
-        object_id = kwargs.get('event_id', None)
-        try:
-            obj = self.contenttype.get_object_for_this_type(pk=object_id)
-        except self.contenttype.model_class().DoesNotExist:
-            obj = None
-        allowed = CHECK_PERMISSION_FUNC(obj, user)
-        if not allowed:
-            return HttpResponseRedirect(settings.LOGIN_URL)
-        return self.f(request, *args, **kwargs)
 
 
 def coerce_date_dict(date_dict):
@@ -110,12 +103,12 @@ def coerce_date_dict(date_dict):
     """
     keys = ['year', 'month', 'day', 'hour', 'minute', 'second']
     retVal = {
-                'year': 1,
-                'month': 1,
-                'day': 1,
-                'hour': 0,
-                'minute': 0,
-                'second': 0}
+        'year': 1,
+        'month': 1,
+        'day': 1,
+        'hour': 0,
+        'minute': 0,
+        'second': 0}
     modified = False
     for key in keys:
         try:
@@ -125,3 +118,25 @@ def coerce_date_dict(date_dict):
             break
     return modified and retVal or {}
 
+
+def handle_redirect_to_login(request, **kwargs):
+    login_url = kwargs.get("login_url")
+    redirect_field_name = kwargs.get("redirect_field_name")
+    next_url = kwargs.get("next_url")
+    if login_url is None:
+        login_url = settings.ACCOUNT_LOGIN_URL
+    if next_url is None:
+        next_url = request.get_full_path()
+    try:
+        login_url = urlresolvers.reverse(login_url)
+    except urlresolvers.NoReverseMatch:
+        if callable(login_url):
+            raise
+        if "/" not in login_url and "." not in login_url:
+            raise
+    url_bits = list(urlparse(login_url))
+    if redirect_field_name:
+        querystring = QueryDict(url_bits[4], mutable=True)
+        querystring[redirect_field_name] = next_url
+        url_bits[4] = querystring.urlencode(safe="/")
+    return HttpResponseRedirect(urlunparse(url_bits))

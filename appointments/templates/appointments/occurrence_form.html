@@ -1,0 +1,12 @@
+{% extends "appointments/event_form_base.html" %}
+{% load i18n %}
+
+{% block appointment-body %}
+<h3>{% trans "Create or change occurrence. All fields are required." %}</h3>
+<form action="" method="post">
+    <table>{{ form.as_table }}</table>
+    <input type="submit" value="{% trans "Save" %}">
+    <input type="button" value="{% trans "Cancel" %}" onclick="window.location='{{next}}'"/>
+    <input type="hidden" name="next" value="{{next|default:""}}"/>
+</form>
+{% endblock %}

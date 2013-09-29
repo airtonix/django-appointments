@@ -5,14 +5,14 @@ from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.dates import WEEKDAYS, WEEKDAYS_ABBR
 
-from .conf.settings import FIRST_DAY_OF_WEEK, SHOW_CANCELLED_OCCURRENCES
+from .conf import settings
 from .models import Occurrence
 from .utils import OccurrenceReplacer
 
 
 weekday_names = []
 weekday_abbrs = []
-if FIRST_DAY_OF_WEEK == 1:
+if settings.FIRST_DAY_OF_WEEK == 1:
     # The calendar week starts on Monday
     for i in range(7):
         weekday_names.append( WEEKDAYS[i] )
@@ -73,7 +73,7 @@ class Period(object):
             return self._persisted_occurrences
 
     def classify_occurrence(self, occurrence):
-        if occurrence.cancelled and not SHOW_CANCELLED_OCCURRENCES:
+        if occurrence.cancelled and not settings.SHOW_CANCELLED_OCCURRENCES:
             return
         if occurrence.start > self.end or occurrence.end < self.start:
             return None
@@ -253,7 +253,7 @@ class Week(Period):
         start = datetime.datetime.combine(week, datetime.time.min)
         # Adjust the start datetime to Monday or Sunday of the current week
         sub_days = 0
-        if FIRST_DAY_OF_WEEK == 1:
+        if settings.FIRST_DAY_OF_WEEK == 1:
             # The week begins on Monday
             sub_days = start.isoweekday() - 1
         else:

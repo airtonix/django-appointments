@@ -1,0 +1,7 @@
+{% extends "appointments/base.html" %}
+{% load appointments_tags %}
+
+{% block appointment-body %}
+<p align="center"><b>{{ calendar.name }}</b></p>
+{% month_table calendar=calendar month=periods.month size="small" %}
+{% endblock %}

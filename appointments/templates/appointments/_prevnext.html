@@ -1,0 +1,7 @@
+{% load appointments_tags %}
+<ul class="button-group">
+    <li><a href="{% prev_url target slug period %}">Previous</a></li>
+    <li><b>{{period_name}}</b></li>
+    <li><a href="{% next_url target slug period %}">Next</a></li>
+</ul>
+

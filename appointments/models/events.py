@@ -41,6 +41,7 @@ class Event(models.Model):
     class Meta:
         verbose_name = _('event')
         verbose_name_plural = _('events')
+        app_label = "appointments"
 
     def __unicode__(self):
         date_format = u'l, %s' % ugettext("DATE_FORMAT")
@@ -336,6 +337,7 @@ class EventRelation(models.Model):
     class Meta:
         verbose_name = _("event relation")
         verbose_name_plural = _("event relations")
+        app_label = "appointments"
 
     def __unicode__(self):
         return u'%s(%s)-%s' % (self.event.title, self.distinction, self.content_object)
@@ -354,6 +356,7 @@ class Occurrence(models.Model):
     class Meta:
         verbose_name = _("occurrence")
         verbose_name_plural = _("occurrences")
+        app_label = "appointments"
 
     def __init__(self, *args, **kwargs):
         super(Occurrence, self).__init__(*args, **kwargs)

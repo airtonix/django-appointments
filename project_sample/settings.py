@@ -83,7 +83,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'schedule',
+    'appointments',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (

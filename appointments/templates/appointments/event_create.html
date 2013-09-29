@@ -1,0 +1,14 @@
+{% extends "appointments/event_form_base.html" %}
+{% load i18n %}
+
+{% block appointment-body %}
+<b>{% trans "Create or change event. All fields are required." %}</b>
+<form action="{% url 'calendar_create_event' calendar_slug=calendar.slug %}" method="post">
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="{% trans "Save" %}">
+    <input type="button" value="{% trans "Cancel" %}" onclick="window.location='{{next}}'"/>
+    <input type="hidden" name="next" value="{{next|default:""}}"/>
+</form>
+{% endblock %}

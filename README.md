@@ -20,7 +20,7 @@ Installation
 
 Download the code; put in into your project’s directory or run
 
-    python setup.py install</pre> to install system-wide.
+    python setup.py install to install system-wide.
 
     REQUIREMENTS: python-vobject (comes with most distribution as a package).
 

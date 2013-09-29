@@ -2,12 +2,11 @@ from django.db.models.signals import pre_save
 
 from models import Event, Calendar
 
-def optionnal_calendar(sender, **kwargs):
+
+def optional_calendar(sender, **kwargs):
     event = kwargs.pop('instance')
 
-    if not isinstance(event, Event):
-        return True
-    if not event.calendar:
+    if isinstance(event, Event):
         try:
             calendar = Calendar._default_manager.get(name='default')
         except Calendar.DoesNotExist:
@@ -15,6 +14,7 @@ def optionnal_calendar(sender, **kwargs):
             calendar.save()
 
         event.calendar = calendar
+
     return True
 
-pre_save.connect(optionnal_calendar)
+pre_save.connect(optional_calendar)
