@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user
 from django.views.generic import DetailView, ListView, DeleteView, UpdateView, CreateView
 from django.db.models.query import Q
 
@@ -212,10 +213,9 @@ class EventCreateView(mixins.LoginRequiredMixin, CreateView):
     def get_initial(self):
         if not self.kwargs.get(self.calendar_slug_kwarg, None):
             raise Http404("Creating an event requires a valid Calendar slug")
-
         initial_data = super(EventCreateView, self).get_initial()
         self.calendar = models.Calendar.objects.get(
-            slug=self.kwargs.get(self.calendar_slug_kwarg))
+            slug__iexact=self.kwargs.get(self.calendar_slug_kwarg))
 
         date = coerce_date_dict(self.request.GET)
         if date:
@@ -227,24 +227,6 @@ class EventCreateView(mixins.LoginRequiredMixin, CreateView):
             })
         return initial_data
 
-    def is_valid(self, form):
-        event = form.save(commit=False)
-        if not self.object:
-            self.object = event
-            self.object.creator = self.request.user
-            self.object.calendar = self.calendar
-            self.object.save()
-
-        return super(EventCreateView, self).is_valid(form)
-
-    def get_success_url(self):
-        return get_next_url(self.request,
-                            self.kwargs.get("next",
-                                            reverse(
-                                                'event', kwargs={"pk": self.object.id,
-                                                                 "calendar_slug": self.object.calendar.slug,
-                                                                 })))
-
     def get_context_data(self, **kwargs):
         context = super(EventCreateView, self).get_context_data(**kwargs)
         context.update({
@@ -252,10 +234,35 @@ class EventCreateView(mixins.LoginRequiredMixin, CreateView):
         })
         return context
 
+    def form_valid(self, form):
+        """
+        Super this class and method and repoint the url at your new class
+        to do things like:
+            associate an activity with an event
+            associate a payment with an event
+            associate guests who might attend
+            associate a location with the event
+        """
+        user = get_user(self.request)
+
+        # assign the creator
+        self.object = form.save(commit=False)
+        self.object.creator = user
+        self.object.calendar = self.calendar
+        self.object.save()
+
+        return super(EventCreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return get_next_url(self.request, self.kwargs.get("next", self.object.get_absolute_url()))
+
 
 class EventUpdateView(mixins.LoginRequiredMixin, UpdateView):
     model = models.Event
     form_class = forms.EventForm
+
+    def form_valid(self, form):
+        return super(EventUpdateView, self).form_valid(form)
 
 
 class EventDeleteView(mixins.LoginRequiredMixin, DeleteView):
