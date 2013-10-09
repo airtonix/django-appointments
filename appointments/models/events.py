@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-# from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -23,18 +23,23 @@ class EventManager(models.Manager):
 
 
 class Event(models.Model):
+
     '''
     This model stores meta data for a date.  You can relate this data to many
     other models.
     '''
     start = models.DateTimeField(_("start"))
-    end = models.DateTimeField(_("end"), help_text=_("The end time must be later than the start time."))
+    end = models.DateTimeField(_("end"), help_text=_(
+        "The end time must be later than the start time."))
     title = models.CharField(_("title"), max_length=255)
     description = models.TextField(_("description"), null=True, blank=True)
     creator = models.ForeignKey(User, null=True, verbose_name=_("creator"))
-    created_on = models.DateTimeField(_("created on"), default=datetime.datetime.now)
-    rule = models.ForeignKey(Rule, null=True, blank=True, verbose_name=_("rule"), help_text=_("Select '----' for a one time only event."))
-    end_recurring_period = models.DateTimeField(_("end recurring period"), null=True, blank=True, help_text=_("This date is ignored for one time only events."))
+    created_on = models.DateTimeField(
+        _("created on"), default=datetime.datetime.now)
+    rule = models.ForeignKey(Rule, null=True, blank=True, verbose_name=_(
+        "rule"), help_text=_("Select '----' for a one time only event."))
+    end_recurring_period = models.DateTimeField(
+        _("end recurring period"), null=True, blank=True, help_text=_("This date is ignored for one time only events."))
     calendar = models.ForeignKey(Calendar, blank=True)
     objects = EventManager()
 
@@ -52,8 +57,13 @@ class Event(models.Model):
         }
 
     def get_absolute_url(self):
-        return ""
-    #     return reverse('event', args=[self.id])
+        return reverse('event', kwargs={"calendar_slug": self.calendar.slug, "pk": self.id})
+
+    def has_relation(self, obj, distinction=None):
+        object_type = ContentType.objects.get_for_model(obj.__class__)
+        return self.relations.filter(content_type=object_type,
+                                     object_id=obj.id,
+                                     distinction=distinction).exists()
 
     def create_relation(self, obj, distinction=None):
         """
@@ -95,7 +105,8 @@ class Event(models.Model):
                 final_occurrences.append(occ)
         # then add persisted occurrences which originated outside of this period but now
         # fall within it
-        final_occurrences += occ_replacer.get_additional_occurrences(start, end)
+        final_occurrences += occ_replacer.get_additional_occurrences(
+            start, end)
         return final_occurrences
 
     def get_rrule_object(self):
@@ -131,7 +142,7 @@ class Event(models.Model):
             if self.end_recurring_period and self.end_recurring_period < end:
                 end = self.end_recurring_period
             rule = self.get_rrule_object()
-            o_starts = rule.between(start-difference, end, inc=True)
+            o_starts = rule.between(start - difference, end, inc=True)
             for o_start in o_starts:
                 o_end = o_start + difference
                 occurrences.append(self._create_occurrence(o_start, o_end))
@@ -179,15 +190,16 @@ class Event(models.Model):
 
 
 class EventRelationManager(models.Manager):
+
     '''
     >>> EventRelation.objects.all().delete()
     >>> CalendarRelation.objects.all().delete()
+    >>> Event.objects.all().delete()
     >>> data = {
     ...         'title': 'Test1',
     ...         'start': datetime.datetime(2008, 1, 1),
     ...         'end': datetime.datetime(2008, 1, 11)
     ...        }
-    >>> Event.objects.all().delete()
     >>> event1 = Event(**data)
     >>> event1.save()
     >>> data['title'] = 'Test2'
@@ -200,6 +212,9 @@ class EventRelationManager(models.Manager):
     >>> event1.create_relation(user1, 'owner')
     >>> event1.create_relation(user2, 'viewer')
     >>> event2.create_relation(user1, 'viewer')
+    >>> event1.has_relation(user1, 'owner')
+    >>> event1.has_relation(user2, 'viewer')
+    >>> event2.has_relation(user1, 'viewer')
     '''
     # Currently not supported
     # Multiple level reverse lookups of generic relations appears to be
@@ -277,7 +292,8 @@ class EventRelationManager(models.Manager):
             )
         else:
             inherit_q = Q()
-        event_q = Q(dist_q, Q(eventrelation__object_id=content_object.id), Q(eventrelation__content_type=ct))
+        event_q = Q(dist_q, Q(eventrelation__object_id=content_object.id),
+                    Q(eventrelation__content_type=ct))
         return Event.objects.filter(inherit_q | event_q)
 
     def change_distinction(self, distinction, new_distinction):
@@ -309,6 +325,7 @@ class EventRelationManager(models.Manager):
 
 
 class EventRelation(models.Model):
+
     '''
     This is for relating data to an Event, there is also a distinction, so that
     data can be related in different ways.  A good example would be, if you have
@@ -326,7 +343,7 @@ class EventRelation(models.Model):
     DISCLAIMER: while this model is a nice out of the box feature to have, it
     may not scale well.  If you use this keep that in mindself.
     '''
-    event = models.ForeignKey(Event, verbose_name=_("event"))
+    event = models.ForeignKey(Event, verbose_name=_("event"), related_name='relations')
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
