@@ -155,6 +155,12 @@ class Calendar(models.Model):
         return self.event_set.all()
     events = property(events)
 
+    def has_relation(self, obj, distinction=None):
+        object_type = ContentType.objects.get_for_model(obj.__class__)
+        return self.relations.filter(content_type=object_type,
+                                     object_id=obj.id,
+                                     distinction=distinction).exists()
+
     def create_relation(self, obj, distinction=None, inheritable=True):
         """
         Creates a CalendarRelation between self and obj.
@@ -228,7 +234,8 @@ class CalendarRelation(models.Model):
     may not scale well.  If you use this, keep that in mind.
     '''
 
-    calendar = models.ForeignKey(Calendar, verbose_name=_("calendar"))
+    calendar = models.ForeignKey(
+        Calendar, verbose_name=_("calendar"), related_name="relations")
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
