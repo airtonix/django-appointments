@@ -9,9 +9,10 @@ class AppointmentAppConf(AppConf):
 
     FIRST_DAY_OF_WEEK = 0
 
-    def configure_first_day_of_week(self, value):
-        if not settings.APPOINTMENT_FIRST_DAY_OF_WEEK:
-            raise ImproperlyConfigured(_("APPOINTMENT_FIRST_DAY_OF_WEEK must be an integer between 0 and 6"))
+    # def configure_first_day_of_week(self, value):
+        # first_day = getattr(settings, 'APPOINTMENT_FIRST_DAY_OF_WEEK', None)
+        # if not first_day or not isinstance(first_day, int) or first_day < 0 or first_day > 6:
+        #     raise ImproperlyConfigured(_("APPOINTMENT_FIRST_DAY_OF_WEEK must be an integer between 0 and 6"))
 
     # default duration (in minutes) for new events
     EVENT_DURATION = 30
