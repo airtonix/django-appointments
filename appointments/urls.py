@@ -12,61 +12,61 @@ urlpatterns = patterns('',
                            views.CalendarListView.as_view(),
                            name="schedule"),
 
-                       # We specify the template_name here instead of inside the view
-                       # because this view suits our ideals of how to manipulate the data,
-                       # but not on how to present it.
-                       url(r'^calendar/year/(?P<slug>[-\w]+)/$',
-                           views.CalenderPeriodsListView.as_view(
-                               template_name='appointments/calendar_year.html',
-                               periods=[Year]),
-                           name="year_calendar"),
-
-                       url(r'^calendar/tri_month/(?P<slug>[-\w]+)/$',
-                           views.CalenderPeriodsListView.as_view(
-                               template_name='appointments/calendar_tri_month.html',
-                               periods=[Month]),
-                           name="tri_month_calendar"),
-
-                       url(r'^calendar/compact_month/(?P<slug>[-\w]+)/$',
-                           views.CalenderPeriodsListView.as_view(
-                               template_name='appointments/calendar_compact_month.html',
-                               periods=[Month]),
-                           name="compact_calendar"),
-
-                       url(r'^calendar/month/(?P<slug>[-\w]+)/$',
-                           views.CalenderPeriodsListView.as_view(
-                               template_name='appointments/calendar_month.html',
-                               periods=[Month]),
-                           name="month_calendar"),
-
-                       url(r'^calendar/week/(?P<slug>[-\w]+)/$',
-                           views.CalenderPeriodsListView.as_view(
-                               template_name='appointments/calendar_week.html',
-                               periods=[Week]),
-                           name="week_calendar"),
-
-                       url(r'^calendar/daily/(?P<slug>[-\w]+)/$',
-                           views.CalenderPeriodsListView.as_view(
-                               template_name='appointments/calendar_day.html',
-                               periods=[Day]),
-                           name="day_calendar"),
-
                        url(r'^calendar/(?P<slug>[-\w]+)/$',
                            views.CalendarView.as_view(),
                            name="calendar_home",
                            ),
 
+                       # We specify the template_name here instead of inside the view
+                       # because this view suits our ideals of how to manipulate the data,
+                       # but not on how to present it.
+                       url(r'^calendar/(?P<slug>[-\w]+)/year/$',
+                           views.CalenderPeriodsListView.as_view(
+                               template_name='appointments/calendar_year.html',
+                               periods=[Year]),
+                           name="year_calendar"),
+
+                       url(r'^calendar/(?P<slug>[-\w]+)/tri_month/$',
+                           views.CalenderPeriodsListView.as_view(
+                               template_name='appointments/calendar_tri_month.html',
+                               periods=[Month]),
+                           name="tri_month_calendar"),
+
+                       url(r'^calendar/(?P<slug>[-\w]+)/compact_month/$',
+                           views.CalenderPeriodsListView.as_view(
+                               template_name='appointments/calendar_compact_month.html',
+                               periods=[Month]),
+                           name="compact_calendar"),
+
+                       url(r'^calendar/(?P<slug>[-\w]+)/month/$',
+                           views.CalenderPeriodsListView.as_view(
+                               template_name='appointments/calendar_month.html',
+                               periods=[Month]),
+                           name="month_calendar"),
+
+                       url(r'^calendar/(?P<slug>[-\w]+)/week/$',
+                           views.CalenderPeriodsListView.as_view(
+                               template_name='appointments/calendar_week.html',
+                               periods=[Week]),
+                           name="week_calendar"),
+
+                       url(r'^calendar/(?P<slug>[-\w]+)/daily/$',
+                           views.CalenderPeriodsListView.as_view(
+                               template_name='appointments/calendar_day.html',
+                               periods=[Day]),
+                           name="day_calendar"),
+
                        # Event Urls
-                       url(r'^event/create/(?P<calendar_slug>[-\w]+)/$',
+                       url(r'^calendar/(?P<calendar_slug>[-\w]+)/event/create/$',
                            views.EventCreateView.as_view(),
                            name='calendar_create_event'),
-                       url(r'^event/edit/(?P<calendar_slug>[-\w]+)/(?P<pk>\d+)/$',
+                       url(r'^calendar/(?P<calendar_slug>[-\w]+)/event/(?P<pk>\d+)/edit/$',
                            views.EventUpdateView.as_view(),
                            name='edit_event'),
-                       url(r'^event/delete/(?P<calendar_slug>[-\w]+)/(?P<pk>\d+)/$',
+                       url(r'^calendar/(?P<calendar_slug>[-\w]+)/event/(?P<pk>\d+)/delete/$',
                            views.EventDeleteView.as_view(),
                            name="delete_event"),
-                       url(r'^event/(?P<calendar_slug>[-\w]+)/(?P<pk>\d+)/$',
+                       url(r'^calendar/(?P<calendar_slug>[-\w]+)/event/(?P<pk>\d+)/$',
                            views.EventDetailView.as_view(),
                            name="event"),
 
